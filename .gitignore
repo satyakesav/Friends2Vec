@@ -1,5 +1,5 @@
 # Environment
 .idea
 
-# Data
-sample_data/*
+# Cache
+embeddings/deepwalk/__pycache__/*
