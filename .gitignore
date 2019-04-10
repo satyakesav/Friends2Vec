@@ -3,3 +3,6 @@
 
 # Cache
 embeddings/deepwalk/__pycache__/*
+
+# Data
+sample_data/*
