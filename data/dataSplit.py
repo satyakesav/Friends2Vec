@@ -17,15 +17,15 @@ with open(ratingsFile, 'r') as infile:
 
 
 print(len(userDict))
-trainFile = cwd +'/train.txt'
-testFile = cwd +'/test.txt'
+trainFile = cwd +'/yelp.train.rating'
+testFile = cwd +'/yelp.test.rating'
 with open(trainFile, 'w') as train, open(testFile, 'w') as test:
     for user in userDict.keys():
         userList = userDict[user]
         random.shuffle(userList)
         for i in range(len(userList)):
-            data = user + '\t' + userList[i][0] + '\t' + userList[i][1] + '\n'
-            print(data)
+            data = user + '\t' + userList[i][0] + '\t' + userList[i][1]
+            #print(data)
             if i == 0:
                 test.write(data)
             else:
