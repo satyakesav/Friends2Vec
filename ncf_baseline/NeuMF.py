@@ -173,13 +173,13 @@ if __name__ == '__main__':
     # Build model
     model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
     if learner.lower() == "adagrad": 
-        model.compile(optimizer=Adagrad(lr=learning_rate), loss='mean_squared_error')
+        model.compile(optimizer=Adagrad(lr=learning_rate), loss='mean_squared_error', metrics=['mae'])
     elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(lr=learning_rate), loss='mean_squared_error')
+        model.compile(optimizer=RMSprop(lr=learning_rate), loss='mean_squared_error', metrics=['mae'])
     elif learner.lower() == "adam":
-        model.compile(optimizer=Adam(lr=learning_rate), loss='mean_squared_error')
+        model.compile(optimizer=Adam(lr=learning_rate), loss='mean_squared_error', metrics=['mae'])
     else:
-        model.compile(optimizer=SGD(lr=learning_rate), loss='mean_squared_error')
+        model.compile(optimizer=SGD(lr=learning_rate), loss='mean_squared_error', metrics=['mae'])
     
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
@@ -217,12 +217,21 @@ if __name__ == '__main__':
                 test_users.append(row[0])
                 test_items.append(row[1])
                 test_ratings.append(row[2])
+
             res = model.predict([np.array(test_users), np.array(test_items)])
             res = list(res.reshape(len(test_ratings)))
             error_list = [(a-b)*(a-b) for a,b in zip(test_ratings, res)]
             mse = math.sqrt(sum(error_list)*1.0/len(test_ratings))
             print("sample results...", res[0:10])
-            print("MSE.....", mse)
+            print("RMSE.....", mse)
+
+            train_res = model.predict([np.array(user_input), np.array(item_input)])
+            train_res = list(res.reshape(len(labels)))
+            error_list = [(a-b)*(a-b) for a,b in zip(labels, train_res)]
+            mse = math.sqrt(sum(error_list)*1.0/len(train_res))
+            print("sample results...", train_res[0:10])
+            print("RMSE.....", mse)
+
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     #         hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
     #         print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]' 
