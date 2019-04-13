@@ -225,12 +225,12 @@ if __name__ == '__main__':
             print("sample results...", res[0:10])
             print("RMSE.....", mse)
 
-            train_res = model.predict([np.array(user_input), np.array(item_input)])
-            train_res = list(res.reshape(len(labels)))
-            error_list = [(a-b)*(a-b) for a,b in zip(labels, train_res)]
-            mse = math.sqrt(sum(error_list)*1.0/len(train_res))
-            print("sample results...", train_res[0:10])
-            print("RMSE.....", mse)
+            # train_res = model.predict([np.array(user_input), np.array(item_input)])
+            # train_res = list(res.reshape(len(labels)))
+            # error_list = [(a-b)*(a-b) for a,b in zip(labels, train_res)]
+            # mse = math.sqrt(sum(error_list)*1.0/len(train_res))
+            # print("sample results...", train_res[0:10])
+            # print("RMSE.....", mse)
 
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     #         hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
