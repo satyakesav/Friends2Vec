@@ -157,7 +157,7 @@ if __name__ == '__main__':
             res = model.predict([np.array(test_users), np.array(test_items)])
             res = list(res.reshape(len(test_ratings)))
             error_list = [(a-b)*(a-b) for a,b in zip(test_ratings, res)]
-            mse = math.sqrt(sum(total_error)*1.0/len(test_ratings))
+            mse = math.sqrt(sum(error_list)*1.0/len(test_ratings))
             print("sample results...", res[0:10])
             print("MSE.....", mse)
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
