@@ -156,7 +156,7 @@ if __name__ == '__main__':
                 test_ratings.append(row[2])
             res = model.predict([np.array(test_users), np.array(test_items)])
             print("sample output", list(res[0:10]))
-            print(res.shape, test_ratings.shape)
+            print(res.shape, len(test_ratings))
             
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     #         hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
