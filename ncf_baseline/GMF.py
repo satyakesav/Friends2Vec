@@ -142,5 +142,14 @@ if __name__ == '__main__':
         
         # Evaluation
         if epoch %verbose == 0:
-            res = model.predict([np.array(user_input), np.array(item_input)])
-            print(res[0:10])
+            test_users, test_items, test_ratings = [], [] , []
+            for row in testRatings:
+                test_users.append(row[0])
+                test_items.append(row[1])
+                test_ratings.append(row[2])
+            res = model.predict([np.array(test_users), np.array(test_items)])
+            res = list(res.reshape(len(test_ratings)))
+            error_list = [(a-b)*(a-b) for a,b in zip(test_ratings, res)]
+            mse = math.sqrt(sum(error_list)*1.0/len(test_ratings))
+            print("sample results...", res[0:10])
+            print("MSE.....", mse)
