@@ -226,7 +226,7 @@ if __name__ == '__main__':
             print("RMSE.....", mse)
 
             train_res = model.predict([np.array(user_input[0:256]), np.array(item_input[0:256])])
-            train_res = list(res.reshape(len(labels[0:256])))
+            train_res = list(train_res.reshape(len(labels[0:256])))
             error_list = [(a-b)*(a-b) for a,b in zip(labels[0:256], train_res)]
             mse = math.sqrt(sum(error_list)*1.0/len(train_res))
             print("sample results...", train_res[0:10])
