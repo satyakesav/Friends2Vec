@@ -146,7 +146,7 @@ if __name__ == '__main__':
                          np.array(labels), # labels 
                          batch_size=batch_size, nb_epoch=1, verbose=0, shuffle=True)
         t2 = time()
-
+        import math
         # Evaluation
         if epoch %verbose == 0:
             test_users, test_items, test_ratings = [], [] , []
@@ -155,9 +155,11 @@ if __name__ == '__main__':
                 test_items.append(row[1])
                 test_ratings.append(row[2])
             res = model.predict([np.array(test_users), np.array(test_items)])
-            print("sample output", list(res[0:10]))
-            print(res.shape, len(test_ratings))
-            
+            res = list(res.reshape(len(test_ratings)))
+            error_list = [(a-b)*(a-b) for a,b in zip(test_ratings, res)]
+            mse = math.sqrt(sum(total_error)*1.0/len(test_ratings))
+            print("sample results...", res[0:10])
+            print("MSE.....", mse)
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     #         hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
     #         print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]' 
