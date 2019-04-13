@@ -20,6 +20,9 @@ _testRatings = None
 _testNegatives = None
 _K = None
 
+def evaluate_model_rmse(model, testRatings):
+    return 0.0
+
 def evaluate_model(model, testRatings, testNegatives, K, num_thread):
     """
     Evaluate the performance (Hit_Ratio, NDCG) of top-K recommendation

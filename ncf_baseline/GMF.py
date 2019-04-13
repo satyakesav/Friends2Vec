@@ -73,29 +73,21 @@ def get_model(num_users, num_items, latent_dim, regs=[0,0]):
     
     # Final prediction layer
     #prediction = Lambda(lambda x: K.sigmoid(K.sum(x)), output_shape=(1,))(predict_vector)
-    prediction = Dense(1, activation='sigmoid', init='lecun_uniform', name = 'prediction')(predict_vector)
+    prediction = Dense(1, activation='linear', init='lecun_uniform', name = 'prediction')(predict_vector)
     
     model = Model(input=[user_input, item_input], 
                 output=prediction)
 
     return model
 
-def get_train_instances(train, num_negatives):
+def get_train_instances(train):
     user_input, item_input, labels = [],[],[]
     num_users = train.shape[0]
     for (u, i) in train.keys():
         # positive instance
         user_input.append(u)
         item_input.append(i)
-        labels.append(1)
-        # negative instances
-        for t in xrange(num_negatives):
-            j = np.random.randint(num_items)
-            while train.has_key((u, j)):
-                j = np.random.randint(num_items)
-            user_input.append(u)
-            item_input.append(j)
-            labels.append(0)
+        labels.append(train[u,i])
     return user_input, item_input, labels
 
 if __name__ == '__main__':
@@ -117,37 +109,30 @@ if __name__ == '__main__':
     # Loading data
     t1 = time()
     dataset = Dataset(args.path + args.dataset)
-    train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
+    train, testRatings = dataset.trainMatrix, dataset.testRatings
     num_users, num_items = train.shape
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d" 
           %(time()-t1, num_users, num_items, train.nnz, len(testRatings)))
     
     # Build model
     model = get_model(num_users, num_items, num_factors, regs)
-    if learner.lower() == "adagrad": 
-        model.compile(optimizer=Adagrad(lr=learning_rate), loss='binary_crossentropy')
-    elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(lr=learning_rate), loss='binary_crossentropy')
-    elif learner.lower() == "adam":
-        model.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy')
-    else:
-        model.compile(optimizer=SGD(lr=learning_rate), loss='binary_crossentropy')
+    model.compile(optimizer=SGD(lr=learning_rate), loss='mean_squared_error')
     #print(model.summary())
     
     # Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-    hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
-    #mf_embedding_norm = np.linalg.norm(model.get_layer('user_embedding').get_weights())+np.linalg.norm(model.get_layer('item_embedding').get_weights())
-    #p_norm = np.linalg.norm(model.get_layer('prediction').get_weights()[0])
-    print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time()-t1))
+    # (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
+    # hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
+    # #mf_embedding_norm = np.linalg.norm(model.get_layer('user_embedding').get_weights())+np.linalg.norm(model.get_layer('item_embedding').get_weights())
+    # #p_norm = np.linalg.norm(model.get_layer('prediction').get_weights()[0])
+    # print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time()-t1))
     
     # Train model
-    best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    # best_hr, best_ndcg, best_iter = hr, ndcg, -1
     for epoch in xrange(epochs):
         t1 = time()
         # Generate training instances
-        user_input, item_input, labels = get_train_instances(train, num_negatives)
+        user_input, item_input, labels = get_train_instances(train)
         
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)], #input
@@ -157,15 +142,5 @@ if __name__ == '__main__':
         
         # Evaluation
         if epoch %verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-            hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
-            print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]' 
-                  % (epoch,  t2-t1, hr, ndcg, loss, time()-t2))
-            if hr > best_hr:
-                best_hr, best_ndcg, best_iter = hr, ndcg, epoch
-                if args.out > 0:
-                    model.save_weights(model_out_file, overwrite=True)
-
-    print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " %(best_iter, best_hr, best_ndcg))
-    if args.out > 0:
-        print("The best GMF model is saved to %s" %(model_out_file))
+            res = model.predict([np.array(user_input), np.array(item_input)])
+            print(res[0:10])
