@@ -134,13 +134,15 @@ if __name__ == '__main__':
     # hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     # print('Init: HR = %.4f, NDCG = %.4f [%.1f]' %(hr, ndcg, time()-t1))
     
-    # Train model
+    # Train modells
+
     # best_hr, best_ndcg, best_iter = hr, ndcg, -1
     for epoch in xrange(epochs):
         t1 = time()
         # Generate training instances
         user_input, item_input, labels = get_train_instances(train)
-    
+        avg_rating = sum(labels)*1.0/len(labels)
+        labels = [l-avg_rating for l in labels]
         # Training        
         hist = model.fit([np.array(user_input), np.array(item_input)], #input
                          np.array(labels), # labels 

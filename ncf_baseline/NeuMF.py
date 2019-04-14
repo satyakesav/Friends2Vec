@@ -203,7 +203,8 @@ if __name__ == '__main__':
         t1 = time()
         # Generate training instances
         user_input, item_input, labels = get_train_instances(train)
-        
+        avg_rating = sum(labels)*1.0/len(labels)
+        labels = [l-avg_rating for l in labels]
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)], #input
                          np.array(labels), # labels 
@@ -220,16 +221,18 @@ if __name__ == '__main__':
 
             res = model.predict([np.array(test_users), np.array(test_items)])
             res = list(res.reshape(len(test_ratings)))
+            res = [l + avg_rating  for l in res]
             error_list = [(a-b)*(a-b) for a,b in zip(test_ratings, res)]
             mse = math.sqrt(sum(error_list)*1.0/len(test_ratings))
-            print("sample results...", res[0:10])
-            print("RMSE.....", mse)
+            print("test tsample results...", res[0:10])
+            print("test RMSE.....", mse)
 
             train_res = model.predict([np.array(user_input[0:256]), np.array(item_input[0:256])])
             train_res = list(train_res.reshape(len(labels[0:256])))
+            train_res = [l + avg_rating  for l in train_res]
             error_list = [(a-b)*(a-b) for a,b in zip(labels[0:256], train_res)]
             mse = math.sqrt(sum(error_list)*1.0/len(train_res))
-            print("sample results...", train_res[0:10])
+            print("rain tsample results...", train_res[0:10])
             print("train RMSE.....", mse)
 
     #         (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
