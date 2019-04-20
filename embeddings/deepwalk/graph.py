@@ -15,6 +15,7 @@ from collections import defaultdict, Iterable
 import random
 from itertools import permutations
 from scipy.sparse import issparse
+import numpy as np
 
 
 class Graph(defaultdict):
@@ -187,6 +188,19 @@ def load_adjacencylist(file_, undirected=False, chunksize=10000, unchecked=True)
             total += len(adj_chunk)
 
     G = convert_func(adjlist)
+
+    if undirected:
+        G = G.make_undirected()
+
+    return G
+
+
+def load_adjacencylist_npy(file_, undirected=False, chunksize=10000, unchecked=True):
+    G = Graph()
+
+    adj_np = np.load(file_).item()
+    for u in adj_np.keys():
+        G[u] = adj_np[u]
 
     if undirected:
         G = G.make_undirected()

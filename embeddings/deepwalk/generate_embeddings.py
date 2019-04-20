@@ -31,7 +31,7 @@ except AttributeError:
 
 
 def process(args):
-    G = graph.load_adjacencylist(args.input, undirected=args.undirected)
+    G = graph.load_adjacencylist_npy(args.input, undirected=args.undirected)
 
     print("Number of nodes: {}".format(len(G.nodes())))
 

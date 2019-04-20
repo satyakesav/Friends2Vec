@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import numpy as np
 import sys
 
 import networkx as nx
@@ -26,8 +27,22 @@ def create_graph(input_file):
     return g
 
 
+def create_graph_npy(input_file):
+    g = nx.Graph()
+    adj_dict = np.load(input_file).item()
+
+    for key in adj_dict.keys():
+        g.add_node(key)
+
+    for u in adj_dict.keys():
+        for v in adj_dict[u]:
+            g.add_edge(u, v)
+
+    return g
+
+
 def process(args):
-    graph = create_graph(args.input)
+    graph = create_graph_npy(args.input)
 
     node2vec = Node2Vec(graph, dimensions=args.dimensions, walk_length=args.walk_length,
                         num_walks=args.number_walks, workers=args.workers)
